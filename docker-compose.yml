@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  # This defines your custom WordPress application service
+  wordpress:
+    # This is the most important line: it tells Coolify to build the Dockerfile in this directory
+    build: .
+    # Ensures your container restarts automatically if it ever stops
+    restart: always
+    # These environment variables are required by WordPress and the Redis plugin.
+    # Coolify will automatically inject the values from its UI.
+    environment:
+      # Standard WordPress database connection
+      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
+      - WORDPRESS_DB_USER=${WORDPRESS_DB_USER}
+      - WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
+      - WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME}
+      
+      # Redis Object Cache plugin settings
+      - WP_REDIS_HOST=${WP_REDIS_HOST}
+      - WP_REDIS_PORT=${WP_REDIS_PORT}
+      - WP_REDIS_PASSWORD=${WP_REDIS_PASSWORD}
+      # This tells the plugin to use the fast phpredis extension we installed
+      - WP_REDIS_CLIENT=phpredis
+    volumes:
+      # This creates a persistent volume for all your WordPress content.
+      # It will safely store your uploads, plugins, and themes across redeployments.
+      - wp_content:/var/www/html/wp-content
+
+# This top-level key defines the named volume used above, allowing Docker to manage it.
+volumes:
+  wp_content:
